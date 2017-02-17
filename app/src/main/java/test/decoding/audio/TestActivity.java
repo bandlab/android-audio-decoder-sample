@@ -26,6 +26,8 @@ public class TestActivity extends Activity {
         System.loadLibrary("decoding-test");
     }
 
+    private static final String TAG = "Decoding test";
+
     private List<String> assets = Arrays.asList("stereo_44.m4a",
                                                 "stereo_48.m4a",
                                                 "stereo_44.mp3",
@@ -47,7 +49,7 @@ public class TestActivity extends Activity {
             public void onClick(View v) {
                 v.setEnabled(false);
                 current = 0;
-                nativeContextPtr = decodeWithOpenSL(files.get(0));
+                decodeCurrent();
             }
         });
 
@@ -75,14 +77,17 @@ public class TestActivity extends Activity {
             public void run() {
 
                 String testFile = new File(files.get(current)).getName();
+                String msg;
 
                 if (success) {
                     String strDuration = new DecimalFormat("#.###").format(duration);
-                    text.append("\n" + testFile + " opensl decoding time: "+strDuration);
+                    msg = testFile + " opensl decoding time: "+strDuration;
                 }
                 else {
-                    text.append("\n" + testFile + " opensl decoding ERROR!");
+                    msg = testFile + " opensl decoding ERROR!";
                 }
+
+                log(msg);
 
                 destroyNativeContext(nativeContextPtr);
 
@@ -96,6 +101,23 @@ public class TestActivity extends Activity {
 
             }
         });
+    }
+
+    private void decodeCurrent() {
+        nativeContextPtr = decodeWithOpenSL(files.get(current));
+        if (nativeContextPtr == 0 && current < files.size() -1) {
+            // try with next file:
+            String errFile = new File(files.get(current)).getName();
+            log(errFile + "error starting decoding!");
+            current++;
+            decodeWithOpenSL(files.get(current));
+        }
+    }
+
+
+    private void log(String msg) {
+        Log.i(TAG,msg);
+        text.append("\n" + msg);
     }
 
     private void extractCompressedFiles() {

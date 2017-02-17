@@ -36,10 +36,10 @@ public:
         decoder.dispose();
     }
 
-    void startDecoding()
+    bool startDecoding()
     {
         startTime = getTime();
-        decoder.start();
+        return decoder.start();
     }
 
     void onBufferDecoded(OpenSLDecoder* d, short* buf, int nSamples, SLDataFormat_PCM& format) override
@@ -92,7 +92,15 @@ Java_test_decoding_audio_TestActivity_decodeWithOpenSL(JNIEnv *env, jobject acti
 {
     const char *file = env->GetStringUTFChars(file_, 0);
     NativeContext *ctx = new NativeContext(env, activity, file);
-    ctx->startDecoding();
+
+    bool res = ctx->startDecoding();
+
+    if (!res)
+    {
+        delete ctx;
+        ctx = nullptr;
+    }
+
     env->ReleaseStringUTFChars(file_, file);
     return (jlong)ctx;
 }
