@@ -7,11 +7,11 @@ DecodeTest.cpp and TestActivity.java show how such wrapper can be used.
 
 The app does nothing with the decoded data (no operation on the audio samples is performed, and no disk writing either).
 
-Below some test results are provided: you will notice that the decoding times skyrocket on Android 7.0+ devices.
-
 Code references:
 [Google sample](https://android.googlesource.com/platform/frameworks/wilhelm/+/master/tests/examples/slesTestDecodeToBuffQueue.cpp) ,
 [Retieving metadata](https://groups.google.com/forum/#!topic/android-ndk/0x9jk-mEH60)
+
+Here are some test results: you will notice that the decoding times skyrocket on Android 7.0+ devices.
 
 ````
 LENOVO A680 - Android 4.2.2
@@ -54,7 +54,7 @@ stereo_44.mp3   13.565 s 
 stereo_48.mp3   14.283 s  
 ````
 ````
-Samsung S7 Edge (SM-G935F)
+Samsung S7 Edge (SM-G935F) - Android 7.0
 
   stereo_44.m4a   17.423 s 
 stereo_48.m4a   22.831 s 
