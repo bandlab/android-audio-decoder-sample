@@ -1,8 +1,8 @@
 #include "OpenSLDecoder.hpp"
 #include "AndroidLogging.h"
-#include <cassert>
 #include <fcntl.h>
 #include <fstream>
+#include <unistd.h>
 
 #define PREFETCH_ERROR_MASK (SL_PREFETCHEVENT_STATUSCHANGE | SL_PREFETCHEVENT_FILLLEVELCHANGE)
 // used to detect errors likely to have occured when the OpenSL ES framework fails to open
@@ -22,7 +22,7 @@ bool OpenSLDecoder::start()
 {
     SLresult res;
     duration = SL_TIME_UNKNOWN;
-    progress = 0.0;
+    progress = 0;
 
     inputFd = open(inputPath.c_str(), O_RDONLY);
     assert(inputFd != -1);
@@ -195,13 +195,6 @@ void OpenSLDecoder::dispose()
     LOGI("[slDecoder] engine released");
 }
 
-float OpenSLDecoder::getProgress()
-{
-    if (duration == SL_TIME_UNKNOWN || progress == SL_TIME_UNKNOWN)
-        return 0.0;
-    return progress / (float) duration;
-}
-
 SLmillisecond OpenSLDecoder::getContentDuration(SLPlayItf playItf)
 {
     SLmillisecond durationInMsec = SL_TIME_UNKNOWN;
@@ -212,6 +205,8 @@ SLmillisecond OpenSLDecoder::getContentDuration(SLPlayItf playItf)
     return durationInMsec;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 void OpenSLDecoder::onBufferDecoded(SLAndroidSimpleBufferQueueItf bq, void* ctx)
 {
     OpenSLDecoder* dec = static_cast<OpenSLDecoder*>(ctx);
@@ -234,6 +229,8 @@ void OpenSLDecoder::onBufferDecoded(SLAndroidSimpleBufferQueueItf bq, void* ctx)
     dec->currentBuffer++;
     dec->currentBuffer = dec->currentBuffer >= N_BUF ? 0 : dec->currentBuffer;
 }
+
+#pragma clang diagnostic pop
 
 void OpenSLDecoder::onPositionEvent(SLPlayItf pitf, void* ctx, SLuint32 event)
 {

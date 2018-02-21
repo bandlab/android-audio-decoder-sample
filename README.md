@@ -69,3 +69,25 @@ stereo_48.m4a   19.043 s 
 stereo_44.mp3   15.29 s 
 stereo_48.mp3   16.495 s
 ````
+
+```
+Emulator x86_64 - 8.1.0
+
+Device: generic_x86 google Android SDK built for x86 OSM1.180201.007
+OS: Android 8.1.0 REL
+stereo_44.m4a opensl decoding time: 12.631
+stereo_48.m4a opensl decoding time: 14.415
+stereo_44.mp3 opensl decoding time: 11.202
+stereo_48.mp3 opensl decoding time: 11.76
+```
+
+```
+Google Pixel XL 2 - 8.1.0
+
+Device: taimen google Pixel 2 XL OPM1.171019.018
+OS: Android 8.1.0 REL
+stereo_44.m4a opensl decoding time: 17.117
+stereo_48.m4a opensl decoding time: 19.523
+stereo_44.mp3 opensl decoding time: 16.986
+stereo_48.mp3 opensl decoding time: 17.05
+```

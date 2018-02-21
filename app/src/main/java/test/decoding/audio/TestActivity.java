@@ -3,6 +3,7 @@ package test.decoding.audio;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +18,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.RunnableFuture;
 
 public class TestActivity extends Activity {
 
@@ -28,12 +28,14 @@ public class TestActivity extends Activity {
 
     private static final String TAG = "Decoding test";
 
-    private List<String> assets = Arrays.asList("stereo_44.m4a",
-                                                "stereo_48.m4a",
-                                                "stereo_44.mp3",
-                                                "stereo_48.mp3");
+    private List<String> assets = Arrays.asList(
+            "stereo_44.m4a",
+            "stereo_48.m4a",
+            "stereo_44.mp3",
+            "stereo_48.mp3"
+    );
 
-    private List<String> files = new ArrayList<String>();
+    private List<String> files = new ArrayList<>();
 
     private int current = -1;
 
@@ -49,11 +51,14 @@ public class TestActivity extends Activity {
             public void onClick(View v) {
                 v.setEnabled(false);
                 current = 0;
+                log("Start decoding");
+                log("Device: " + Build.DEVICE + " " + Build.BRAND + " " + Build.MODEL + " " + Build.ID);
+                log("OS: Android " + Build.VERSION.RELEASE + " " + Build.VERSION.CODENAME);
                 decodeCurrent();
             }
         });
 
-        text = (TextView) findViewById(R.id.sample_text);
+        text = findViewById(R.id.sample_text);
     }
 
     private TextView text;
@@ -61,17 +66,17 @@ public class TestActivity extends Activity {
     private long nativeContextPtr = 0;
 
     public native long decodeWithOpenSL(String file);
+
     public native void destroyNativeContext(long nativePtr);
 
 
-    // this is called from native code when decoding is over
+    /**
+     * this is called from native code when decoding is over
+     */
+    @SuppressWarnings("unused")
+    public void onFileDecoded(final boolean success, final double duration) {
 
-    public void onFileDecoded(boolean succ, double dur) {
-
-        final boolean success = succ;
-        final double duration = dur;
-
-        runOnUiThread(new Runnable () {
+        runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
@@ -81,9 +86,8 @@ public class TestActivity extends Activity {
 
                 if (success) {
                     String strDuration = new DecimalFormat("#.###").format(duration);
-                    msg = testFile + " opensl decoding time: "+strDuration;
-                }
-                else {
+                    msg = testFile + " opensl decoding time: " + strDuration;
+                } else {
                     msg = testFile + " opensl decoding ERROR!";
                 }
 
@@ -91,21 +95,20 @@ public class TestActivity extends Activity {
 
                 destroyNativeContext(nativeContextPtr);
 
-                if (current < files.size()-1) {
+                if (current < files.size() - 1) {
                     current++;
                     nativeContextPtr = decodeWithOpenSL(files.get(current));
-                }
-                else {
+                } else {
                     findViewById(R.id.button_start).setEnabled(true);
+                    Log.i(TAG, "Measurement result:\n" + text.getText().toString());
                 }
-
             }
         });
     }
 
     private void decodeCurrent() {
         nativeContextPtr = decodeWithOpenSL(files.get(current));
-        if (nativeContextPtr == 0 && current < files.size() -1) {
+        if (nativeContextPtr == 0 && current < files.size() - 1) {
             // try with next file:
             String errFile = new File(files.get(current)).getName();
             log(errFile + "error starting decoding!");
@@ -116,7 +119,7 @@ public class TestActivity extends Activity {
 
 
     private void log(String msg) {
-        Log.i(TAG,msg);
+        Log.i(TAG, msg);
         text.append("\n" + msg);
     }
 
@@ -134,36 +137,38 @@ public class TestActivity extends Activity {
 
         AssetManager am = ctx.getAssets();
         InputStream source = null;
-        File destFile = null;
+        File destFile;
         OutputStream destination = null;
 
         try {
             source = am.open(assetName);
-            destFile = new File(ctx.getFilesDir(),assetName);
+            destFile = new File(ctx.getFilesDir(), assetName);
             destination = new FileOutputStream(destFile);
 
             byte[] buffer = new byte[1024];
             int read;
-            while((read = source.read(buffer)) != -1){
+            while ((read = source.read(buffer)) != -1) {
                 destination.write(buffer, 0, read);
             }
 
             return destFile.getCanonicalPath();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
-        }
-        finally {
+        } finally {
             if (source != null) {
                 try {
                     source.close();
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                    //Do nothing
+                }
             }
             if (destination != null) {
                 try {
                     destination.close();
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                    //Do nothing
+                }
             }
         }
     }
