@@ -114,3 +114,14 @@ stereo_48.m4a opensl decoding time: 22.586
 stereo_44.mp3 opensl decoding time: 21.339
 stereo_48.mp3 opensl decoding time: 19.443
 ```
+
+```
+Google Pixel XL 2 - 10.0 (Beta 5)
+
+Device: taimen google Pixel 2 XL QPP5.190530.014
+OS: Android 10 REL
+stereo_44.m4a opensl decoding time: 15.755
+stereo_48.m4a opensl decoding time: 22.156
+stereo_44.mp3 opensl decoding time: 18.303
+stereo_48.mp3 opensl decoding time: 19.675
+```
